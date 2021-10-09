@@ -3,12 +3,34 @@
 <script src="https://unpkg.com/vue@2.5.17"></script>
 
 <div id="app">
-
+  <p>
+    {{ items[0].name }}: {{ items[0].price }} X {{ items[0].quantity }}
+  </p>
 </div>
-
+  
 <script>
-new Vue({
-template: '<p>{{msg}}</p>',
-data: {msg: 'hello world!'}
-}).$mount('#app')
+  var items = [
+    {
+      name: '鉛筆',
+      price: 300,
+      quantity: 0
+    },
+    {
+      name: 'ノート',
+      price: 400,
+      quantity: 0
+    },
+    {
+      name: '消しゴム',
+      price: 500,
+      quantity: 0
+    },
+  ]
+  var vm = new Vue({
+    el: '#app',
+    data: {
+      items: items
+    }
+  })
+  window.vm
 </script>

@@ -3,16 +3,44 @@
 <script src="https://unpkg.com/vue@2.5.17"></script>
 
 <div id="app">
-  <button id="b-button" v-bind:disabled="! canBuy">
-    購入
-  </button>
+  <p>
+    {{ items[0].name }}: {{ items[0].price }} X {{ items[0].quantity }}
+  </p>
+  <p>
+    フィルタ処理例 {{1000 | numberWithDelimiter}}
+  </p>
 </div>
   
 <script>
+  var items = [
+    {
+      name: '鉛筆',
+      price: 300,
+      quantity: 0
+    },
+    {
+      name: 'ノート',
+      price: 400,
+      quantity: 0
+    },
+    {
+      name: '消しゴム',
+      price: 500,
+      quantity: 0
+    },
+  ]
   var vm = new Vue({
-    el: '#b-button',
+    el: '#app',
     data: {
-      canBuy: false
+      items: items
+    },
+    filters: {
+      numberWithDelimiter: function (value) {
+        if (!value) {
+          return '0'
+        }
+        return value.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1,')
+      }
     }
   })
 </script>

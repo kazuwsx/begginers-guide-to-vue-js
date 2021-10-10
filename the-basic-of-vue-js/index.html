@@ -4,19 +4,16 @@
 
 <div id="app">
   <p>
-    {{ items[0].name }}: {{ items[0].price }} X {{ items[0].quantity }}
-  </p>
-  <p>
-    フィルタ処理例 {{1000 | numberWithDelimiter}}
+    合計: {{ totalPrice }}
   </p>
 </div>
-  
+
 <script>
   var items = [
     {
       name: '鉛筆',
       price: 300,
-      quantity: 0
+      quantity: 3
     },
     {
       name: 'ノート',
@@ -26,7 +23,7 @@
     {
       name: '消しゴム',
       price: 500,
-      quantity: 0
+      quantity: 1
     },
   ]
   var vm = new Vue({
@@ -41,6 +38,17 @@
         }
         return value.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1,')
       }
+    },
+    computed: {
+      totalPrice: function () {
+        return this.items.reduce(function (sum, item) {
+          return sum + (item.price * item.quantity)
+        }, 0)
+      },
+      totalPriceWithTax: function () {
+        return Math.floor(this.totalPrice * 1.08)
+      }
     }
   })
+  wimdow
 </script>

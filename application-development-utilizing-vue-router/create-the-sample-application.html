@@ -6,12 +6,17 @@
   <nav>
     <router-link to="/top">トップページ</router-link>
     <router-link to="/users">ユーザー一覧ページ</router-link>
+    <router-link to="/users/new?redirect=true">新規ユーザー登録</router-link>
+    <router-link to="/login" v-show="!Auth.loggedIn()">ログイン</router-link>
+    <router-link to="/logout" v-show="Auth.loggedIn()">ログアウト</router-link>
     <router-view></router-view>
   </nav>
 </div>
 
-<script src="https://unpkg.com/vue@2.5.17"></script>
-<script src="https://unpkg.com/vue-router@3.0.1"></script>
+<script src="
+      https://unpkg.com/vue@2.5.17"> </script>
+<script src="https://unpkg.com/vue-router@3.0.1">
+</script>
 
 <script type="text/x-template" id="user-list">
   <div>
@@ -57,6 +62,26 @@
         <input type="button" @click="createUser" value="送信">
       </div>
     </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="login">
+  <div>
+    <h2>Login</h2>
+    <p v-if="$route.query.redirect">
+      ログインしてください
+    </p>
+    <form @submit.prevent="login">
+      <label>
+        <input v-model="email" placeholder="email">
+      </label>
+      <label>
+        <input v-model="pass" placeholder="password" type="password">
+      </label>
+      <br>
+      <button type="submit">ログイン</button>
+      <p v-if="error" class="error">ログインに失敗しました</p>
+    </form>
   </div>
 </script>
 
@@ -106,6 +131,98 @@
     }, 1000)
   }
 
+  var Auth = {
+    login: function (email, pass, cb) {
+      setTimeout(function () {
+        if (email === 'vue@example.com' && pass === 'vue') {
+          localStorage.token = Math.random().toString(36).substring(7)
+          if (cb) {
+            cb(true)
+          }
+        } else {
+          if (cb) {
+            cb(false)
+          }
+        }
+      }, 0)
+    },
+
+    logout: function () {
+      delete localStorage.token
+    },
+
+    loggedIn: function () {
+      console.log('a')
+      return !!localStorage.token
+    }
+  }
+
+  var router = new VueRouter({
+    routes: [
+      {
+        path: '/top',
+        component: {
+          template: '<div>トップページです。</div>'
+        }
+      },
+      {
+        path: '/users',
+        component: UserList
+      },
+      {
+        path: '/users/new',
+        component: UserCreate,
+        beforeEnter: function (to, from, next) {
+          if (!Auth.loggedIn()) {
+            next({
+              path: '/login',
+              query: { redirect: to.fullPath }
+            })
+          } else {
+            next()
+          }
+        }
+      },
+      {
+        path: '/users/:userId',
+        component: UserDetail
+      },
+      {
+        path: '/login',
+        component: Login
+      },
+      {
+        path: '/logout',
+        beforeEnter: function (to, from, next) {
+          Auth.logout()
+          next('/')
+        }
+      }
+    ]
+  })
+
+  var Login = {
+    template: '#login',
+    data: function () {
+      return {
+        email: 'vue@example.com',
+        pass: '',
+        error: false
+      }
+    },
+    methods: {
+      login: function () {
+        Auth.login(this.email, this.pass, (function (loggedIn) {
+          if (!loggedIn) {
+            this.error = true
+          } else {
+            this.$router.replace(this.$route.query.redirect || '/')
+          }
+        }).bind(this))
+      }
+    }
+  }
+
   var UserCreate = {
     template: '#user-create',
     data: function () {
@@ -148,8 +265,6 @@
           }
         }).bind(this))
       },
-
-
     }
   }
 
